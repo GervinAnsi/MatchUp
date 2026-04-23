@@ -1,0 +1,28 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}Kustuta turniir{% endblock %}
+
+{% block content %}
+<section class="card form-card">
+    <div class="card-header">
+        <div>
+            <h1 class="card-title">Kustuta turniir</h1>
+            <p class="card-subtitle">See tegevus on pöördumatu.</p>
+        </div>
+    </div>
+
+    <div class="stack">
+        <div class="message warning">
+            Oled kustutamas turniiri <strong>{{ tournament.name }}</strong>.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="button-row">
+                <button type="submit" class="button-danger">Jah, kustuta</button>
+                <a href="{% url 'tournaments:tournament_detail' tournament.pk %}" class="button button-secondary">Tühista</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,49 @@
+<div class="card form-card">
+    <div class="card-header">
+        <div>
+            <h1 class="card-title">{{ page_title }}</h1>
+            {% if subtitle %}
+                <p class="card-subtitle">{{ subtitle }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="message error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+                {% if field.field.widget.input_type == "checkbox" %}
+                    <label class="checkbox-row">
+                        {{ field }}
+                        <span>{{ field.label }}</span>
+                    </label>
+                {% else %}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                {% endif %}
+
+                {% if field.help_text %}
+                    <div class="helptext">{{ field.help_text }}</div>
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="errorlist">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="button-row">
+            <button type="submit">Salvesta</button>
+            {% if back_url %}
+                <a href="{{ back_url }}" class="button button-secondary">Tagasi</a>
+            {% endif %}
+        </div>
+    </form>
+</div>

@@ -1,0 +1,45 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}Sisesta tulemus{% endblock %}
+
+{% block content %}
+<section class="card form-card">
+    <div class="card-header">
+        <div>
+            <h1 class="card-title">Sisesta mängu tulemus</h1>
+            <p class="card-subtitle">{{ match.participant1.name }} vs {{ match.participant2.name }}</p>
+        </div>
+    </div>
+
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="message error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group">
+                {% if field.field.widget.input_type == "checkbox" %}
+                    <label class="checkbox-row">
+                        {{ field }}
+                        <span>{{ field.label }}</span>
+                    </label>
+                {% else %}
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="errorlist">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="button-row">
+            <button type="submit">Salvesta tulemus</button>
+            <a href="{% url 'tournaments:tournament_detail' tournament.pk %}" class="button button-secondary">Tagasi</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

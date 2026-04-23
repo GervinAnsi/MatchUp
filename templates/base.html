@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MatchUp{% endblock %} · MatchUp</title>
+    <link rel="stylesheet" href="{% static 'tournaments/css/style.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a href="{% url 'tournaments:tournament_list' %}" class="brand">
+                <div class="brand-mark">M</div>
+                <div class="brand-text">
+                    <span>MatchUp</span>
+                    <small>Turniiride haldus</small>
+                </div>
+            </a>
+
+            <nav class="nav-actions">
+                <a href="{% url 'tournaments:tournament_list' %}" class="button button-outline">Kõik turniirid</a>
+                <a href="{% url 'tournaments:tournament_create' %}" class="button button-primary">+ Loo turniir</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <div class="container">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <div class="footer-space"></div>
+    <script src="{% static 'tournaments/js/app.js' %}"></script>
+</body>
+</html>

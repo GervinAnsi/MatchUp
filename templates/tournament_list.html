@@ -1,0 +1,86 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}Turniirid{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-grid">
+        <div>
+            <div class="eyebrow">Minimalistlik turniiriplatvorm</div>
+            <h1>Halda turniire selgelt, kiiresti ja ilma segaduseta.</h1>
+            <p class="lead">
+                Loo uusi turniire, halda osalejaid, sisesta tulemusi ja jälgi kogu turniiri staatust ühest kohast.
+            </p>
+            <div class="button-row" style="margin-top: 20px;">
+                <a href="{% url 'tournaments:tournament_create' %}" class="button button-primary">Loo uus turniir</a>
+            </div>
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat-card">
+                <div class="stat-label">Kokku turniire</div>
+                <div class="stat-value">{{ tournaments|length }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Spordialasid kokku</div>
+                <div class="stat-value">{{ sport_types_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Mängijaid kokku</div>
+                <div class="stat-value">{{ total_players }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Lõpetatud turniire</div>
+                <div class="stat-value">{{ completed_tournaments }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="card">
+    <div class="card-header">
+        <div>
+            <h2 class="card-title">Kõik turniirid</h2>
+            <p class="card-subtitle">Vali turniir, et näha detaile, osalejaid ja mänge.</p>
+        </div>
+    </div>
+
+    {% if tournaments %}
+        <div class="tournament-list">
+            {% for tournament in tournaments %}
+                <a href="{% url 'tournaments:tournament_detail' tournament.pk %}" class="tournament-item">
+                    <div class="tournament-top">
+                        <div>
+                            <p class="tournament-name">{{ tournament.name }}</p>
+                            <div class="meta">
+                                <span>{{ tournament.get_sport_type_display }}</span>
+                                <span>•</span>
+                                <span>{{ tournament.get_format_display }}</span>
+                            </div>
+                        </div>
+
+                        <div class="badge-row">
+                            <span class="badge primary">{{ tournament.get_status_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="meta">
+                        <span>📅 {{ tournament.date }}</span>
+                        <span>🕒 {{ tournament.time }}</span>
+                        <span>👥 {{ tournament.participant_count }}/{{ tournament.max_participants }}</span>
+                        <span>📍 {{ tournament.location|default:"Asukoht puudub" }}</span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-card">
+            <h3>Turniire veel ei ole</h3>
+            <p>Loo esimene turniir ja alusta haldamisega.</p>
+            <div class="button-row" style="justify-content:center; margin-top: 16px;">
+                <a href="{% url 'tournaments:tournament_create' %}" class="button button-primary">Loo turniir</a>
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+{% url 'tournaments:tournament_list' as back_url %}
+{% include "tournaments/partials/form_card.html" with subtitle="Loo või muuda turniiri põhiandmeid." back_url=back_url %}
+{% endblock %}

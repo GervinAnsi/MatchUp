@@ -1,0 +1,227 @@
+{% extends "tournaments/base.html" %}
+
+{% block title %}{{ tournament.name }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-grid">
+        <div>
+            <div class="eyebrow">{{ tournament.get_sport_type_display }} · {{ tournament.get_format_display }}</div>
+            <h1>{{ tournament.name }}</h1>
+            <p class="lead">
+                {{ tournament.description|default:"Kirjeldus puudub. Lisa turniiri detailid, osalejad ja mängutulemused siit vaatest." }}
+            </p>
+
+            <div class="badge-row" style="margin-top: 18px;">
+                <span class="badge primary">{{ tournament.get_status_display }}</span>
+                <span class="badge">{{ tournament.date }}</span>
+                <span class="badge">{{ tournament.time }}</span>
+                <span class="badge">{{ tournament.location|default:"Asukoht puudub" }}</span>
+            </div>
+
+            <div class="button-row" style="margin-top: 20px;">
+                {% if is_admin %}
+                    <a href="{% url 'tournaments:tournament_update' tournament.pk %}" class="button button-primary">Muuda turniiri</a>
+                    <a href="{% url 'tournaments:tournament_admin_logout' tournament.pk %}" class="button button-secondary">Logi välja</a>
+                    <a href="{% url 'tournaments:tournament_delete' tournament.pk %}" class="button button-danger">Kustuta</a>
+                {% else %}
+                    <a href="{% url 'tournaments:tournament_admin_login' tournament.pk %}" class="button button-primary">Admin login</a>
+                {% endif %}
+
+                <a href="{% url 'tournaments:error_report_create' tournament.pk %}" class="button button-outline">Teavita veast</a>
+            </div>
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat-card">
+                <div class="stat-label">Osalejaid</div>
+                <div class="stat-value">{{ participants|length }}/{{ tournament.max_participants }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Mänge</div>
+                <div class="stat-value">{{ matches|length }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Vorming</div>
+                <div class="stat-value">{{ tournament.get_format_display }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Admin</div>
+                <div class="stat-value">{% if is_admin %}Aktiivne{% else %}Puudub{% endif %}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="grid grid-main">
+    <section class="stack">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Osalejad</h2>
+                    <p class="card-subtitle">Kõik selle turniiri mängijad või meeskonnad.</p>
+                </div>
+
+                {% if is_admin %}
+                    <a href="{% url 'tournaments:participant_create' tournament.pk %}" class="button button-primary">+ Lisa osaleja</a>
+                {% endif %}
+            </div>
+
+            {% if participants %}
+                <div class="list-rows">
+                    {% for participant in participants %}
+                        <div class="list-row">
+                            <div class="list-row-left">
+                                <div class="row-title">{{ participant.name }}</div>
+                                <div class="row-meta">
+                                    {{ participant.get_type_display }}
+                                    {% if participant.seed %} • Paigutus: {{ participant.seed }}{% endif %}
+                                    {% if participant.contact_info %} • {{ participant.contact_info }}{% endif %}
+                                </div>
+                            </div>
+
+                            {% if is_admin %}
+                                <div class="button-row">
+                                    <a href="{% url 'tournaments:participant_update' tournament.pk participant.pk %}" class="button button-outline">Muuda</a>
+                                    <a href="{% url 'tournaments:participant_delete' tournament.pk participant.pk %}" class="button button-danger">Kustuta</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-card">
+                    Ühtegi osalejat pole veel lisatud.
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Mängud</h2>
+                    <p class="card-subtitle">Turniiri voorud ja tulemused.</p>
+                </div>
+
+                {% if is_admin and tournament.format == "single_elimination" %}
+                    <div class="button-row">
+                        <a href="{% url 'tournaments:generate_single_elimination_matches' tournament.pk %}" class="button button-primary">
+                            Genereeri esimene voor
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if matches %}
+                <div class="match-list">
+                    {% for match in matches %}
+                        <div class="match-card">
+                            <div class="match-head">
+                                <div>
+                                    <div class="row-meta">Voor {{ match.round }}</div>
+                                    <div class="match-versus">{{ match.participant1.name }} vs {{ match.participant2.name }}</div>
+                                </div>
+                                <div class="badge-row">
+                                    <span class="badge">{{ match.get_status_display }}</span>
+                                    {% if match.winner %}
+                                        <span class="badge success">Võitja: {{ match.winner.name }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="match-result">
+                                {% if match.result %}
+                                    Tulemus: {{ match.result.participant1_score }} - {{ match.result.participant2_score }}
+                                    {% if match.result.result_confirmed %}
+                                        • kinnitatud
+                                    {% else %}
+                                        • kinnitamata
+                                    {% endif %}
+                                {% else %}
+                                    Tulemus puudub
+                                {% endif %}
+                            </div>
+
+                            {% if is_admin %}
+                                <div class="button-row" style="margin-top: 14px;">
+                                    <a href="{% url 'tournaments:match_result_update' tournament.pk match.pk %}" class="button button-outline">
+                                        Sisesta tulemus
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-card">
+                    Mänge pole veel loodud.
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <aside class="stack">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">Ülevaade</h2>
+                    <p class="card-subtitle">Olulised andmed ühes kohas.</p>
+                </div>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric">
+                    <div class="stat-label">Staatus</div>
+                    <div class="value">{{ tournament.get_status_display }}</div>
+                </div>
+                <div class="metric">
+                    <div class="stat-label">Kuupäev</div>
+                    <div class="value">{{ tournament.date }}</div>
+                </div>
+                <div class="metric">
+                    <div class="stat-label">Kell</div>
+                    <div class="value">{{ tournament.time }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if standings %}
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h2 class="card-title">Tabeliseis</h2>
+                        <p class="card-subtitle">Round robin punktiseis.</p>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Osaleja</th>
+                                <th>M</th>
+                                <th>V</th>
+                                <th>Vi</th>
+                                <th>K</th>
+                                <th>P</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in standings %}
+                                <tr>
+                                    <td>{{ row.participant.name }}</td>
+                                    <td>{{ row.played }}</td>
+                                    <td>{{ row.wins }}</td>
+                                    <td>{{ row.draws }}</td>
+                                    <td>{{ row.losses }}</td>
+                                    <td>{{ row.points }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}
