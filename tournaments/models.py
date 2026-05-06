@@ -47,7 +47,7 @@ class Tournament(models.Model):
 
     status = models.CharField(
         max_length=30,
-        choices=TournamentStatus.choices,
+        choices=TournamentStatus.choices,  
         default=TournamentStatus.DRAFT,
     )
 

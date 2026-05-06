@@ -108,6 +108,15 @@
                         <a href="{% url 'tournaments:generate_single_elimination_matches' tournament.pk %}" class="button button-primary">
                             Genereeri esimene voor
                         </a>
+                        {% if can_generate_next_round %}
+                            <form method="post" action="{% url 'tournaments:generate_next_round' tournament.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="current_round" value="{{ current_round }}">
+                                <button type="submit" class="button button-outline">
+                                    Genereeri järgmine voor
+                                </button>
+                            </form>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
